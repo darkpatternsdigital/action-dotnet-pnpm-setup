@@ -1,0 +1,36 @@
+name: 'Dark Patterns .NET and Pnpm Setup'
+description: 'Installs .NET, PNPM, and Node, the Dark Patterns way'
+inputs:
+  node-version:
+    description: Default node version
+    default: '20'
+outputs: {}
+runs:
+  using: 'composite'
+  steps:
+    # .NET install and cache
+    - uses: actions/setup-dotnet@v4
+      with:
+        # The main version this project uses
+        dotnet-version: '8.0.x'
+        cache: true
+        cache-dependency-path: '**/packages.lock.json'
+
+    # PNPM install and cache
+    - uses: pnpm/action-setup@v4
+      with:
+        run_install: false
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+
+    - name: Install PNPM dependencies
+      run: pnpm install --frozen-lockfile
+      shell: pwsh
+
+    - name: Restore dependencies
+      run: dotnet restore --locked-mode
+      shell: pwsh
