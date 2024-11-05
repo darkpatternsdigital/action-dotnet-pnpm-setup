@@ -14,7 +14,7 @@ runs:
         # The main version this project uses
         dotnet-version: '8.0.x'
         cache: true
-        cache-dependency-path: '**/packages.lock.json'
+        cache-dependency-path: ${{ (hashFiles('**/packages.lock.json') == '' && '**/*.csproj') || '**/packages.lock.json' }}
 
     # PNPM install and cache
     - uses: pnpm/action-setup@v4
