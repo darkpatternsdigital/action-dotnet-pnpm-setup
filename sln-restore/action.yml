@@ -21,10 +21,19 @@ runs:
       with:
         run_install: false
 
+    - name: Ensure Pnpm Store is set correctly
+      # For some reason, at least when using nektosact, the store-dir is not correct by default.
+      shell: sh
+      run: |-
+        if [ "$(pnpm config get store-dir)" != "$PNPM_HOME" ]; then
+          echo "pnpm store not set to \$PNPM_HOME, setting now..."
+          echo "pnpm config set store-dir \"$PNPM_HOME/../../.pnpm-cache\""
+          pnpm config set store-dir "$PNPM_HOME/../../.pnpm-cache"
+        fi
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
 
     - name: Install PNPM dependencies
