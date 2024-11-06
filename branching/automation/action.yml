@@ -4,7 +4,7 @@ inputs:
   skip_install:
     description: |
       When true, skip the installation step; the tools should already be installed in the tools_path.
-    default: 'true'
+    default: 'false'
   tools_path:
     description: |
       Directory in which to checkout the git tools
