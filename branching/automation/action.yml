@@ -1,34 +1,10 @@
 name: 'Scaled Git Branching Model automation'
 description: 'Automates aspects of the Scaled Git Branching Model'
-inputs:
-  skip_install:
-    description: |
-      When true, skip the installation step; the tools should already be installed in the tools_path.
-    default: 'false'
-  tools_path:
-    description: |
-      Directory in which to checkout the git tools
-    default: '${{ runner.temp }}/git-tools'
-  repository:
-    description: |
-      Repository to clone containing the git tools
-    default: https://github.com/DarkPatternsDigital/scalable-git-branching-tools.git
-  version:
-    description: |
-      Version of the git tools repository to install. Must be a commitish (aka commit, branch, or tag) from the repository.
-    default: main
+inputs: {}
 outputs: {}
 runs:
   using: 'composite'
   steps:
-    - name: Install git-tools
-      uses: ./.github/workflows/branching-install/
-      if: ${{ inputs.skip_install != 'true' }}
-      with:
-        tools_path: ${{ inputs.tools_path }}
-        repository: ${{ inputs.repository }}
-        version: ${{ inputs.version }}
-
     - name: 'Determine state'
       shell: pwsh
       if: ${{ github.event_name == 'pull_request' }}
