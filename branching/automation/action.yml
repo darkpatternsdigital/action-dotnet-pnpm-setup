@@ -28,3 +28,18 @@ runs:
         tools_path: ${{ inputs.tools_path }}
         repository: ${{ inputs.repository }}
         version: ${{ inputs.version }}
+
+    - name: 'Determine state'
+      shell: pwsh
+      if: ${{ github.event_name == 'pull_request' }}
+      env:
+        HEAD_REF: ${{ github.head_ref }}
+        BASE_REF: ${{ github.base_ref }}
+      run: |
+        git tool-config
+        Write-Host "Head: $($env:HEAD_REF) --> Base: $($env:BASE_REF)"
+        $dependencies = git show-deps -noFetch -quiet
+        $allDependencies = git show-deps -noFetch -quiet -recurse
+        $dependants = git show-dependants -noFetch -quiet
+        $allDependants = git show-dependants -noFetch -quiet -recurse
+        @{ dependencies = $dependencies; allDependencies = $allDependencies; dependants = $dependants; allDependants = $allDependants } | ConvertTo-Json | Write-Host
