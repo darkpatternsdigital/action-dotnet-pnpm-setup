@@ -14,8 +14,8 @@ runs:
       run: |
         git tool-config
         Write-Host "Head: $($env:HEAD_REF) --> Base: $($env:BASE_REF)"
-        $dependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet
-        $allDependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet -recurse
-        $dependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet
-        $allDependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet -recurse
+        [string[]] $dependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet
+        [string[]] $allDependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet -recurse
+        [string[]] $dependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet
+        [string[]] $allDependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet -recurse
         @{ dependencies = $dependencies; allDependencies = $allDependencies; dependants = $dependants; allDependants = $allDependants } | ConvertTo-Json | Write-Host
