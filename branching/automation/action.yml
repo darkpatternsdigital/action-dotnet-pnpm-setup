@@ -5,6 +5,10 @@ outputs: {}
 runs:
   using: 'composite'
   steps:
+    - name: 'Fetch branches'
+      shell: pwsh
+      run: |
+        git fetch
     - name: 'Determine state'
       shell: pwsh
       if: ${{ github.event_name == 'pull_request' }}
@@ -12,10 +16,28 @@ runs:
         HEAD_REF: ${{ github.head_ref }}
         BASE_REF: ${{ github.base_ref }}
       run: |
-        git fetch
         Write-Host "Head: $($env:HEAD_REF) --> Base: $($env:BASE_REF)"
+
         [string[]] $dependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet
+        if ($dependencies -contains $env:HEAD_REF) {
+          Write-Host "Direct dependency, should remove current branch on merge"
+          return
+        }
         [string[]] $allDependencies = git show-deps -target $($env:HEAD_REF) -noFetch -quiet -recurse
+        if ($allDependencies -contains $env:HEAD_REF) {
+          Write-Host "Indirect dependency, should remove curren branch and others in between"
+          return
+        }
         [string[]] $dependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet
+        if ($dependants -contains $env:HEAD_REF) {
+          Write-Host "Direct dependant; this should automatically merge if there are no conflicts once checks pass."
+          return
+        }
         [string[]] $allDependants = git show-dependants -target $($env:HEAD_REF) -noFetch -quiet -recurse
+        if ($allDependants -contains $env:HEAD_REF) {
+          Write-Host "Indirect dependant; this should never happen"
+          return
+        }
+
+        Write-Host "No relation to the base could be found; this probably means it should be added as a dependency."
         @{ dependencies = $dependencies; allDependencies = $allDependencies; dependants = $dependants; allDependants = $allDependants } | ConvertTo-Json | Write-Host
