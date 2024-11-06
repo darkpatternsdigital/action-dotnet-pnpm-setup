@@ -1,0 +1,31 @@
+name: 'Install scalable-git-branching-tools'
+description: 'Installs the scalable git branching tools for a git repository'
+inputs:
+  tools_path:
+    description: |
+      Directory in which to checkout the git tools
+    default: '${{ runner.temp }}/git-tools'
+  repository:
+    description: |
+      Repository to clone containing the git tools
+    default: https://github.com/DarkPatternsDigital/scalable-git-branching-tools.git
+  version:
+    description: |
+      Version of the git tools repository to install. Must be a commitish (aka commit, branch, or tag) from the repository.
+    default: main
+outputs: {}
+runs:
+  using: 'composite'
+  steps:
+    - name: Clone tools
+      shell: pwsh
+      run: git clone --branch '${{ inputs.version }}' --single-branch --depth 1 '${{ inputs.repository }}' '${{ inputs.tools_path }}'
+      # Does not use actions/checkout because path must be within github.workspace to use that action
+
+    - name: Verify tools
+      shell: pwsh
+      run: ls ${{ inputs.tools_path }}
+
+    - name: Preserve tools path
+      shell: pwsh
+      run: echo "${{ inputs.tools_path }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
