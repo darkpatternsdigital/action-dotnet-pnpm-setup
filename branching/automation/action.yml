@@ -22,7 +22,7 @@ runs:
   using: 'composite'
   steps:
     - name: Install git-tools
-      uses: ./.github/workflows/branching-install/action.yml
+      uses: ./.github/workflows/branching-install/
       if: ${{ inputs.skip_install != 'true' }}
       with:
         tools_path: ${{ inputs.tools_path }}
